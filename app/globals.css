@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  3D box styles. These stay in plain CSS because they rely on
+  preserve-3d, backface-visibility and layered texture backgrounds
+  that read better here than as long Tailwind class strings.
+*/
+@layer components {
+  /* ---------- gold foil logo ---------- */
+  .foil-text {
+    background: linear-gradient(105deg, #6a4512 0%, #8e6324 20%, #b48838 32%, #e2c47f 38%, #a97d33 45%, #7a5118 58%, #956a28 72%, #c39b50 80%, #7c5419 100%);
+    background-size: 320% 100%;
+    background-position: var(--sheen, 30%) 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0.6px 0 rgba(255, 236, 190, 0.55)) drop-shadow(0 -0.6px 0 rgba(60, 34, 8, 0.45));
+  }
+
+  /* ---------- 3D primitives ---------- */
+  .p3 { position: absolute; transform-style: preserve-3d; }
+  .face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .face-back { transform: rotateY(180deg); }
+
+  /* kraft board: fibre texture + light/shade overlay driven by --sh */
+  .kraft { background: linear-gradient(140deg, #e9c894 0%, #e0b882 38%, #d7ac72 72%, #cda066 100%); border-radius: 1.5px; }
+  .kraft::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; mix-blend-mode: multiply; opacity: 0.45;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .36 0 0 0 0 .16 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.02 .35' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .3 0 0 0 0 .1 0 0 0 .12 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  }
+  .kraft::after, .velvet::after {
+    content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 244, 220, calc(0.18 - var(--sh, 0) * 0.4)) 0%, rgba(255, 244, 220, 0) 40%), rgba(45, 24, 6, var(--sh, 0));
+  }
+  .kraft > * { z-index: 2; }
+  .kraft-inner { background: linear-gradient(160deg, #cfa46c, #be905a); }
+  .crease { box-shadow: inset 0 0 0 0.7px rgba(110, 68, 22, 0.35), inset 0 0 0 1.6px rgba(255, 236, 200, 0.18); }
+
+  .velvet { background: radial-gradient(120% 90% at 50% 40%, #25211d, #121110); box-shadow: inset 0 0 26px 8px rgba(0, 0, 0, 0.75); }
+  .velvet::before { content: ""; position: absolute; inset: 0; opacity: 0.5; background-image: radial-gradient(rgba(255, 255, 255, 0.07) 0.6px, transparent 0.8px); background-size: 4px 4px; }
+  .ao-t { box-shadow: none; background: linear-gradient(#050505, #1d1a17 70%, #2a2621); }
+  .ao-b { box-shadow: none; background: linear-gradient(0deg, #050505, #1d1a17 70%, #2a2621); }
+  .ao-l { box-shadow: none; background: linear-gradient(90deg, #050505, #1b1815 70%, #262220); }
+  .ao-r { box-shadow: none; background: linear-gradient(270deg, #050505, #1b1815 70%, #262220); }
+
+  /* cut board edges */
+  .rim { left: 0; top: 100%; width: 100%; height: 4px; transform-origin: 50% 0; transform: rotateX(-90deg); }
+  .rim .face { background: linear-gradient(#9c6c35, #c49460 35%, #a87a44 55%, #c79a64 80%, #8f6230); }
+  .drim { left: 0; top: 100%; width: 100%; height: 3px; transform-origin: 50% 0; transform: rotateX(90deg); }
+  .drim .face { background: linear-gradient(#c49460, #e0b87f 50%, #b8884f); }
+
+  /* soft table shadows */
+  .table-shadow { position: absolute; background: rgba(58, 33, 10, 0.5); filter: blur(13px); border-radius: 8px; pointer-events: none; }
+  .table-shadow.tight { background: rgba(40, 22, 6, 0.55); filter: blur(3px); }
+
+  /* ---------- ribbon ---------- */
+  .satin {
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 250, 230, 0.05) 0 0.5px, transparent 0.5px 1.5px),
+      linear-gradient(90deg, #9a7128 0%, #c79d4c 10%, #e9cd86 26%, #fff3cc 36%, #edd08a 46%, #cba352 62%, #e4c47a 78%, #c29846 90%, #987026 100%);
+  }
+  .rib-seg { position: absolute; left: 0; width: 100%; transform-style: preserve-3d; transform-origin: 50% 0; }
+  .rib-face { position: absolute; left: 0; right: 0; top: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .rib-face::after { content: ""; position: absolute; inset: 0; background: var(--rib-light, transparent); }
+  .rib-face::before {
+    content: ""; position: absolute; inset: 0 0 auto; height: 1.6px;
+    background: rgba(255, 246, 218, var(--rib-crease, 0));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue::after { animation: none !important; }
+}
+
+@layer components {
+  /* jewellery photo: a tight contact shadow on the velvet that softens as the piece is lifted */
+  .jewel-photo {
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) drop-shadow(var(--jx, 3px) var(--jy, 6px) var(--jb, 6px) rgba(0, 0, 0, var(--ja, 0.55)));
+  }
+}
